@@ -4,19 +4,14 @@ import copy
 
 class Population_Manager(object) :
 
-    def __init__(self, initial_population,
-                 mutation_rate, prob_node_copy, 
-                 fitness_selection_prob, diversity_selection_prob): 
-
+    def __init__(self, initial_population, mutation_rate, prob_node_copy): 
         self.population = initial_population
-        self.pop_size = len(initial_population)
-    
+        self.pop_size = len(initial_population)    
         self.prob_node_copy = prob_node_copy    
         self.mutation_rate = mutation_rate
 
 
-    def breed_new_population(self):        
-        
+    def breed_new_population(self):       
         pop_size_in = len(self.population)
         self.population = self.selection()       
 
@@ -25,11 +20,11 @@ class Population_Manager(object) :
             self.population.append(child)    
 
 
-    def selection(self):
-      
+    def selection(self):      
         # survival of the fittest
         self.population.sort(key=lambda x: x.fitness, reverse=True)    
         new_population = []
+
         for i in range(len(self.population)):            
             if random.random() < ((len(self.population) - i) / (len(self.population))):                                       
                 new_population.append(self.population[i])
@@ -53,7 +48,7 @@ class Population_Manager(object) :
                     for k in range(len(child.controller.weights[i][j])):     
                         random_parent = random.choice([parent_1, parent_2]) 
                         if random.random() > self.mutation_rate:                 
-                             child.controller.weights[i][j][k] = random_parent.controller.weights[i][j][k]
+                             child.controller.weights[i][j][k] = copy.deepcopy(random_parent.controller.weights[i][j][k])
                         else:
                             self.mutate_weight(child, random_parent, i, j, k)
         return child
@@ -61,7 +56,7 @@ class Population_Manager(object) :
 
     def mutate_weight(self, child, parent, i, j, k):       
         random_number = random.randint(1,6)
-        parent_weight = parent.controller.weights[i][j][k]
+        parent_weight = copy.deepcopy(parent.controller.weights[i][j][k])
         # random weights from initialization
         if random_number == 1:    
             return
@@ -78,7 +73,10 @@ class Population_Manager(object) :
             child.controller.weights[i][j][k] = parent_weight *(-1)                            
         # change random weight 
         elif random_number == 6:
-            random_i = random.randint(0,len(child.controller.weights))
-            random_j = random.randint(0,len(child.controller.weights[i]))
-            random_k = random.randint(0,len(child.controller.weights[i][j]))
-            child.controller.weights[i][j][k] = parent.weights[random_i][random_j][random_k]
+            random_i = random.randint(0,len(child.controller.weights)-1)
+            random_j = random.randint(0,len(child.controller.weights[random_i])-1)
+            random_k = random.randint(0,len(child.controller.weights[random_i][random_j])-1)
+            child.controller.weights[i][j][k] = copy.deepcopy(parent.controller.weights[random_i][random_j][random_k])
+
+
+# TODO's: check copy, bias

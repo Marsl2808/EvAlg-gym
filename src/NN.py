@@ -1,9 +1,9 @@
 import numpy as np
+import copy
 
 class Neural_Network(object):
   
-    def __init__(self, n_layer_nodes, weight_interval):
-        
+    def __init__(self, n_layer_nodes, weight_interval):        
         self.n_hidden = len(n_layer_nodes) - 2
         self.n_layer_nodes = n_layer_nodes
         self.weight_interval = weight_interval
@@ -16,9 +16,7 @@ class Neural_Network(object):
 
         # activation-functions
         self.sigmoid = lambda x : (1/(1 + np.exp(-x))) 
-
-        self.tanh = lambda x : np.tanh(x)
-        
+        self.tanh = lambda x : np.tanh(x)        
         self.relu = lambda x : np.maximum(x, 0)
  
  
@@ -36,5 +34,4 @@ class Neural_Network(object):
         return final_out
 
     def set_weights(self, weights):
-        self.weights = weights
-        return 0
+        self.weights = copy.deepcopy(weights)

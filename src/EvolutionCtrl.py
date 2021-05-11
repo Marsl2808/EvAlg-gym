@@ -50,41 +50,35 @@ class Population_Manager(object) :
                     child.controller.weights[i][j] = copy.deepcopy(random_parent.controller.weights[i][j])
                 # loop over weights 
                 else:
-                    for k in range(len(child.controller.weights[i][j])): #loop over weights of node       
-                        if random.random() > self.mutation_rate: # crossover                   
-                             random_parent = random.choice([parent_1, parent_2]) 
+                    for k in range(len(child.controller.weights[i][j])):     
+                        random_parent = random.choice([parent_1, parent_2]) 
+                        if random.random() > self.mutation_rate:                 
                              child.controller.weights[i][j][k] = random_parent.controller.weights[i][j][k]
                         else:
-                            random_parent_weight = random.choice([parent_1.controller.weights[i][j][k], parent_2.controller.weights[i][j][k]])
-                            child.controller.weights[i][j][k] = self.mutate_weight(child.controller.weights[i][j][k], random_parent_weight)
+                            self.mutate_weight(child, random_parent, i, j, k)
         return child
     
 
-    def mutate_weight(self, weight, random_weight):                   
-        random_number = random.randint(1,5)
+    def mutate_weight(self, child, parent, i, j, k):       
+        random_number = random.randint(1,6)
+        parent_weight = parent.controller.weights[i][j][k]
         # random weights from initialization
         if random_number == 1:    
-            return weight
+            return
         # add +/- random_nr[0,1] to parent_1 weights
         elif random_number == 2: 
-            weight = random_weight + random.random()
+            child.controller.weights[i][j][k] = parent_weight + random.random()
         elif random_number == 3:
-            weight = random_weight - random.random()
+            child.controller.weights[i][j][k] = parent_weight - random.random()
         # deactivate weight
         elif random_number == 4:                                
-            weight = 0.0
+            child.controller.weights[i][j][k] = 0.0
         # change sign
         elif random_number == 5:                               
-            weight = random_weight *(-1)                            
-        return weight 
-
-        # # change random node of const. layer
-        # elif random_number == 9:
-        #     random_j = random.randint(0,len(child.weights[i])-1)
-        #     random_k = random.randint(0,len(child.weights[i][j])-1)
-        #     child.weights[i][j][k] = parent_1.weights[i][random_j][random_k]
-        # elif random_number == 10:
-        #     random_j = random.randint(0,len(child.weights[i])-1)
-        #     random_k = random.randint(0,len(child.weights[i][j])-1)
-        #     child.weights[i][j][k] = parent_2.weights[i][random_j][random_k] 
-           
+            child.controller.weights[i][j][k] = parent_weight *(-1)                            
+        # change random weight 
+        elif random_number == 6:
+            random_i = random.randint(0,len(child.controller.weights))
+            random_j = random.randint(0,len(child.controller.weights[i]))
+            random_k = random.randint(0,len(child.controller.weights[i][j]))
+            child.controller.weights[i][j][k] = parent.weights[random_i][random_j][random_k]

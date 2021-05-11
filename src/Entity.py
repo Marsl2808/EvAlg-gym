@@ -7,6 +7,8 @@ class Entity(object):
         self.controller = Neural_Network(n_layer_nodes, weight_interval)
         self.fitness = -1000
         
+        self.survived = False
+        
 #        self.length_of_fitness_ecl_vector = 0.0
 #        self.diversity_of_vector_difference = 0.0  
 #        self.euclidean_dist = 0

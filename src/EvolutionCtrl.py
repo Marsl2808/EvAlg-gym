@@ -13,43 +13,30 @@ class Population_Manager(object) :
     
         self.prob_node_copy = prob_node_copy    
         self.mutation_rate = mutation_rate
-        
-        # self.selection_fitness_prob = fitness_selection_prob
-        # self.selection_diversity_prob = diversity_selection_prob
-        
-        # self.mutation_weight_interval = [-2.0, 2.0]
-        # self.uper_bound_weight_interval = 1
-        
+
 
     def breed_new_population(self):        
         
-        new_population = self.selection()       
-     
-        # 2) crossover & mutation
-        while(len(new_population) < self.pop_size):
-            child = self.crossover(random.choice(new_population), random.choice(new_population))
-            new_population.append(child)
+        pop_size_in = len(self.population)
+        self.population = self.selection()       
 
-        self.population = new_population      
+        while(len(self.population) < pop_size_in):
+            child = self.crossover(random.choice(self.population), random.choice(self.population))
+            self.population.append(child)    
 
 
     def selection(self):
+      
         # survival of the fittest
-        self.population.sort(key=lambda x: x.fitness, reverse=True)   
-        print(f"max fitness is: {self.population[0].fitness}") 
-
-        # save best 2 individuums
-        new_population = [x for x in self.population[0:1]]      
-        new_population = []       
-        for i in range(2, len(self.population)):            
-            if random.random() < ((self.pop_size - i) / (self.pop_size)):                                       
-                new_population.append(self.population[i])     
-
+        self.population.sort(key=lambda x: x.fitness, reverse=True)    
+        new_population = []
+        for i in range(len(self.population)):            
+            if random.random() < ((len(self.population) - i) / (len(self.population))):                                       
+                new_population.append(self.population[i])
+ 
         print(f"{len(new_population)} survived walker, max fitness is: {new_population[0].fitness}") 
 
         return new_population
-
-
 
     def crossover(self, parent_1, parent_2):
         child = Entity(parent_1.controller.n_layer_nodes, parent_1.controller.weight_interval)
@@ -61,9 +48,43 @@ class Population_Manager(object) :
                 if random.random() > self.prob_node_copy:
                     random_parent = random.choice([parent_1, parent_2])
                     child.controller.weights[i][j] = copy.deepcopy(random_parent.controller.weights[i][j])
-                #2) #loop over weights of node and choose random parent (50% probability each)
+                # loop over weights 
                 else:
-                    for k in range(len(child.controller.weights[i][j])): #loop over weights of node                        
-                        random_parent = random.choice([parent_1, parent_2])    
-                        child.controller.weights[i][j][k] = random_parent.controller.weights[i][j][k]
+                    for k in range(len(child.controller.weights[i][j])): #loop over weights of node       
+                        if random.random() > self.mutation_rate: # crossover                   
+                             random_parent = random.choice([parent_1, parent_2]) 
+                             child.controller.weights[i][j][k] = random_parent.controller.weights[i][j][k]
+                        else:
+                            random_parent_weight = random.choice([parent_1.controller.weights[i][j][k], parent_2.controller.weights[i][j][k]])
+                            child.controller.weights[i][j][k] = self.mutate_weight(child.controller.weights[i][j][k], random_parent_weight)
         return child
+    
+
+    def mutate_weight(self, weight, random_weight):                   
+        random_number = random.randint(1,5)
+        # random weights from initialization
+        if random_number == 1:    
+            return weight
+        # add +/- random_nr[0,1] to parent_1 weights
+        elif random_number == 2: 
+            weight = random_weight + random.random()
+        elif random_number == 3:
+            weight = random_weight - random.random()
+        # deactivate weight
+        elif random_number == 4:                                
+            weight = 0.0
+        # change sign
+        elif random_number == 5:                               
+            weight = random_weight *(-1)                            
+        return weight 
+
+        # # change random node of const. layer
+        # elif random_number == 9:
+        #     random_j = random.randint(0,len(child.weights[i])-1)
+        #     random_k = random.randint(0,len(child.weights[i][j])-1)
+        #     child.weights[i][j][k] = parent_1.weights[i][random_j][random_k]
+        # elif random_number == 10:
+        #     random_j = random.randint(0,len(child.weights[i])-1)
+        #     random_k = random.randint(0,len(child.weights[i][j])-1)
+        #     child.weights[i][j][k] = parent_2.weights[i][random_j][random_k] 
+           

@@ -39,10 +39,20 @@ class Population_Manager(object) :
         for i in range(len(child.controller.weights)):   
             # loop over nodes
             for j in range(len(child.controller.weights[i])): 
-                #1) inherit complete node with defined probability (currently no mutation)
+
+                # inherit complete node 
                 if random.random() > self.prob_node_copy:
                     random_parent = random.choice([parent_1, parent_2])
                     child.controller.weights[i][j] = copy.deepcopy(random_parent.controller.weights[i][j])
+                    
+                    # first layer has no bias, last layer has differnet size TODO 
+                    if i != 1 and i < child.controller.n_hidden - 1: 
+                        child.controller.bias[i][j] = copy.deepcopy(random_parent.controller.bias[i][j])
+
+                if (i != 1) and (i < child.controller.n_hidden - 1) and (random.random() > self.mutation_rate): 
+                    random_parent = random.choice([parent_1, parent_2])
+                    self.mutate_bias(child, random_parent, i, j)
+
                 # loop over weights 
                 else:
                     for k in range(len(child.controller.weights[i][j])):     
@@ -77,6 +87,26 @@ class Population_Manager(object) :
             random_j = random.randint(0,len(child.controller.weights[random_i])-1)
             random_k = random.randint(0,len(child.controller.weights[random_i][random_j])-1)
             child.controller.weights[i][j][k] = copy.deepcopy(parent.controller.weights[random_i][random_j][random_k])
+
+
+    def mutate_bias(self, child, parent, i, j): 
+        case_of_mutation = random.randint(1,5)
+        parent_bias = copy.deepcopy(parent.controller.bias[i][j])
+        # random bias
+        if case_of_mutation == 1:    
+            return
+        # add +/- random_nr[0,1] to parent_1 bias
+        elif case_of_mutation == 2: 
+            child.controller.bias[i][j] = parent_bias + random.random()
+        elif case_of_mutation == 3:
+            child.controller.bias[i][j] = parent_bias - random.random()
+        # deactivate bias
+        elif case_of_mutation == 4:                                
+            child.controller.bias[i][j] = 0.0
+        # change sign of parent bias
+        elif case_of_mutation == 5:                               
+            child.controller.bias[i][j] = parent_bias * (-1)                                
+
 
 
 # TODO's: check copy, bias

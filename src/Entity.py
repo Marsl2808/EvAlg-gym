@@ -1,8 +1,9 @@
-from NN import Neural_Network
+from src.NN import Neural_Network
+
 
 class Entity(object):
 
-    def __init__(self, n_layer_nodes, weight_interval):        
+    def __init__(self, n_layer_nodes, weight_interval):
         self.controller = Neural_Network(n_layer_nodes, weight_interval)
-        self.fitness = -1000        
+        self.fitness = -1000
         self.survived = False

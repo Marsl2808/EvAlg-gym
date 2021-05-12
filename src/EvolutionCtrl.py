@@ -1,5 +1,5 @@
 import random
-import copy
+from copy import deepcopy
 from src.Entity import Entity
 
 
@@ -11,13 +11,14 @@ class Population_Manager(object):
         self.prob_node_copy = prob_node_copy
         self.mutation_rate = mutation_rate
 
-    def breed_new_population(self):
+    def breed_new_population(self, generation_act):
         pop_size_in = len(self.population)
         self.population = self.selection()
 
         while(len(self.population) < pop_size_in):
             child = self.crossover(random.choice(self.population),
-                                   random.choice(self.population))
+                                   random.choice(self.population),
+                                   generation_act)
             self.population.append(child)
 
     def selection(self):
@@ -35,42 +36,52 @@ class Population_Manager(object):
 
         return new_population
 
-    def crossover(self, parent_1, parent_2):
+    def crossover(self, parent_1, parent_2, gen_act):
         child = Entity(parent_1.controller.n_layer_nodes,
                        parent_1.controller.weight_interval)
-        # loop over layers
-        for i in range(len(child.controller.weights)):
-            # loop over nodes
-            for j in range(len(child.controller.weights[i])):
 
-                # inherit complete node
+        for l in range(len(child.controller.weights)):
+            if l == child.controller.n_hidden:
+                self.set_bias_output(parent_1, parent_2, child, l)
+
+            for n in range(len(child.controller.weights[l])):
+                random_parent = random.choice([parent_1, parent_2])
+
+                if l != 1 and l < child.controller.n_hidden - 1:
+                    self.set_bias_hidden(child, l, n, random_parent)
+
                 if random.random() > self.prob_node_copy:
-                    random_parent = random.choice([parent_1, parent_2])
-                    child.controller.weights[i][j] = copy.deepcopy(
-                        random_parent.controller.weights[i][j])
+                    self.copy_node(gen_act, child, l, n, random_parent)
 
-                    # first layer no bias, last layer differnet size TODO
-                    if i != 1 and i < child.controller.n_hidden - 1:
-                        child.controller.bias[i][j] = copy.deepcopy(
-                            random_parent.controller.bias[i][j])
-
-                if ((i != 1) and (i < child.controller.n_hidden - 1) and
-                   (random.random() > self.mutation_rate)):
-                    random_parent = random.choice([parent_1, parent_2])
-                    self.mutate_bias(child, random_parent, i, j)
-
-                # loop over weights
                 else:
-                    for k in range(len(child.controller.weights[i][j])):
+                    for w in range(len(child.controller.weights[l][n])):
                         random_parent = random.choice([parent_1, parent_2])
                         if random.random() > self.mutation_rate:
-                            child.controller.weights[i][j][k] = (random_parent
-                                                                 .controller
-                                                                 .weights
-                                                                 [i][j][k])
+                            self.set_weights(random_parent, l, n, w, child)
                         else:
-                            self.mutate_weight(child, random_parent, i, j, k)
+                            self.mutate_weight(child, random_parent, l, n, w)
         return child
+
+    def set_weights(self, random_parent, i, j, k, child):
+        child.controller.weights[i][j][k] = (random_parent.controller.weights
+                                             [i][j][k])
+
+    def set_bias_output(self, parent_1, parent_2, child, i):
+        for j in range(len(child.controller.bias[i])):
+            random_parent = random.choice([parent_1, parent_2])
+            child.controller.bias[i][j] = random_parent.controller.bias[i][j]
+
+    def set_bias_hidden(self, child, i, j, random_parent):
+        child.controller.bias[i][j] = (random_parent.controller.bias[i][j])
+        if (random.random() > self.mutation_rate):
+            self.mutate_bias(child, random_parent, i, j)
+
+    def copy_node(self, gen_act, child, i, j, random_parent):
+        child.controller.weights[i][j] = deepcopy(random_parent.controller
+                                                  .weights[i][j])
+        # first layer no bias, last layer differnet size TODO
+        if i != 1 and i < child.controller.n_hidden - 1:
+            child.controller.bias[i][j] = random_parent.controller.bias[i][j]
 
     def mutate_weight(self, child, parent, i, j, k):
         random_number = random.randint(1, 6)

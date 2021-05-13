@@ -1,6 +1,7 @@
 import random
 from copy import deepcopy
 from src.Entity import Entity
+import logging
 
 
 class Population_Manager(object):
@@ -11,14 +12,13 @@ class Population_Manager(object):
         self.prob_node_copy = prob_node_copy
         self.mutation_rate = mutation_rate
 
-    def breed_new_population(self, generation_act):
+    def breed_new_population(self):
         pop_size_in = len(self.population)
         self.population = self.selection()
 
         while(len(self.population) < pop_size_in):
             child = self.crossover(random.choice(self.population),
-                                   random.choice(self.population),
-                                   generation_act)
+                                   random.choice(self.population))
             self.population.append(child)
 
     def selection(self):
@@ -31,14 +31,21 @@ class Population_Manager(object):
                                   (len(self.population))):
                 new_population.append(self.population[i])
 
-        print(f"{len(new_population)} survived walker," +
-              f"max fitness: {new_population[0].fitness}")
+        logging.info(f"{len(new_population)} survived walker," +
+                     f"max fitness: {new_population[0].fitness}")
 
         return new_population
 
-    def crossover(self, parent_1, parent_2, gen_act):
+    def crossover(self, parent_1, parent_2):
         child = Entity(parent_1.controller.n_layer_nodes,
                        parent_1.controller.weight_interval)
+
+        #################################
+        # Welford
+        child.obs_norm = deepcopy(random.choice([parent_1, parent_2])
+                                  .updated_obs_norm)
+        child.updated_obs_norm = deepcopy(child.obs_norm)
+        #################################
 
         for l in range(len(child.controller.weights)):
             if l == child.controller.n_hidden:
@@ -51,7 +58,7 @@ class Population_Manager(object):
                     self.set_bias_hidden(child, l, n, random_parent)
 
                 if random.random() > self.prob_node_copy:
-                    self.copy_node(gen_act, child, l, n, random_parent)
+                    self.copy_node(child, l, n, random_parent)
 
                 else:
                     for w in range(len(child.controller.weights[l][n])):
@@ -76,7 +83,7 @@ class Population_Manager(object):
         if (random.random() > self.mutation_rate):
             self.mutate_bias(child, random_parent, i, j)
 
-    def copy_node(self, gen_act, child, i, j, random_parent):
+    def copy_node(self, child, i, j, random_parent):
         child.controller.weights[i][j] = deepcopy(random_parent.controller
                                                   .weights[i][j])
         # first layer no bias, last layer differnet size TODO
@@ -86,21 +93,17 @@ class Population_Manager(object):
     def mutate_weight(self, child, parent, i, j, k):
         random_number = random.randint(1, 6)
         parent_weight = parent.controller.weights[i][j][k]
-        # random weights from initialization
+        # random weights (init)
         if random_number == 1:
             return
-        # add +/- random_nr[0,1] to parent_1 weights
         elif random_number == 2:
             child.controller.weights[i][j][k] = parent_weight + random.random()
         elif random_number == 3:
             child.controller.weights[i][j][k] = parent_weight - random.random()
-        # deactivate weight
         elif random_number == 4:
             child.controller.weights[i][j][k] = 0.0
-        # change sign
         elif random_number == 5:
             child.controller.weights[i][j][k] = parent_weight * (-1)
-        # change random weight
         elif random_number == 6:
             random_i = random.randint(0, len(child.controller.weights)-1)
             random_j = random.randint(0, len(child.controller.weights[random_i]
@@ -114,17 +117,14 @@ class Population_Manager(object):
     def mutate_bias(self, child, parent, i, j):
         case_of_mutation = random.randint(1, 5)
         parent_bias = parent.controller.bias[i][j]
-        # random bias
+        # random bias (init)
         if case_of_mutation == 1:
             return
-        # add +/- random_nr[0,1] to parent_1 bias
         elif case_of_mutation == 2:
             child.controller.bias[i][j] = parent_bias + random.random()
         elif case_of_mutation == 3:
             child.controller.bias[i][j] = parent_bias - random.random()
-        # deactivate bias
         elif case_of_mutation == 4:
             child.controller.bias[i][j] = 0.0
-        # change sign of parent bias
         elif case_of_mutation == 5:
             child.controller.bias[i][j] = parent_bias * (-1)

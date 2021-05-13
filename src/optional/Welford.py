@@ -1,15 +1,16 @@
 import math
 
+
 class Welford(object):
     """ Implements Welford's algorithm for computing a running mean
-    and standard deviation as described at: 
+    and standard deviation as described at:
         http://www.johndcook.com/standard_deviation.html
     can take single values or iterables
     Properties:
         mean    - returns the mean
         std     - returns the std
         meanfull- returns the mean and std of the mean
-        
+
         Usage:
         >>> foo = Welford()
         >>> foo(range(100))
@@ -28,14 +29,14 @@ class Welford(object):
         source: https://gist.github.com/alexalemi/2151722
     """
 
-    def __init__(self,lst=None):
+    def __init__(self, lst=None):
         self.k = 0
         self.M = 0
         self.S = 0
-        
+
         self.__call__(lst)
-    
-    def update(self,x):
+
+    def update(self, x):
         if x is None:
             return
         self.k += 1
@@ -43,27 +44,30 @@ class Welford(object):
         newS = self.S + (x - self.M)*(x - newM)
         self.M, self.S = newM, newS
 
-    def consume(self,lst):
+    def consume(self, lst):
         lst = iter(lst)
         for x in lst:
             self.update(x)
-    
-    def __call__(self,x):
-        if hasattr(x,"__iter__"):
+
+    def __call__(self, x):
+        if hasattr(x, "__iter__"):
             self.consume(x)
         else:
             self.update(x)
-            
+
     @property
     def mean(self):
         return self.M
+
     @property
     def meanfull(self):
         return self.mean, self.std/math.sqrt(self.k)
+
     @property
     def std(self):
-        if self.k==1:
+        if self.k == 1:
             return 0
         return math.sqrt(self.S/(self.k-1))
+
     def __repr__(self):
         return "<Welford: {} +- {}>".format(self.mean, self.std)

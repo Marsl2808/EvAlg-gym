@@ -1,6 +1,6 @@
 import random
 from copy import deepcopy
-from src.Entity import Entity
+from src.entity import Entity
 import logging
 
 

@@ -6,9 +6,9 @@ import time
 
 class TrainEval(object):
 
-    def eval_training(self, population, generation):
+    def eval_training(self, population):
         self.calc_diversity(population)
-        self.plot_fitness_diversity(population, generation)
+        self.plot_fitness_diversity(population)
 
     def calc_diversity(self, population):
         start_t = time.time()
@@ -32,11 +32,10 @@ class TrainEval(object):
 
         logging.info(f"Time for diversity calculation: {time.time() - start_t}")
 
-    def plot_fitness_diversity(self, population, generation):
+    def plot_fitness_diversity(self, population):
 
         plt.plot([x.fitness for x in population],
                  [x.hamming_dist for x in population], 'ro')
-        plt.title('Generation:' + str(generation))
         plt.grid(which='both')
         plt.xlabel('Fitness')
         plt.ylabel('Diversity')

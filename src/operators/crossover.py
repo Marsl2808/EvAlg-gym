@@ -15,27 +15,24 @@ class Crossover(object):
         child = Entity(parents[0].controller.n_layer_nodes,
                        parents[0].controller.weight_interval)
 
-        for layer_idx in range(len(child.controller.weights)):
-            if layer_idx == child.controller.n_hidden:
-                self.set_bias_output(parents, child, layer_idx)
+        for i in range(len(child.controller.weights)):
+            if i == child.controller.n_hidden:
+                self.set_bias_output(parents, child, i)
 
-            for node_idx in range(len(child.controller.weights[layer_idx])):
+            for j in range(len(child.controller.weights[i])):
                 random_parent = random.choice(parents)
 
-                if layer_idx != 1 and layer_idx < (child.controller.n_hidden
-                                                   - 1):
-                    self.set_bias_hidden(child, layer_idx, node_idx,
+                if i < child.controller.n_hidden:
+                    self.set_bias_hidden(child, i, j,
                                          random_parent)
 
                 if random.random() > self.prob_node_copy:
-                    self.copy_node(child, layer_idx, node_idx, random_parent)
+                    self.copy_node(child, i, j, random_parent)
 
                 else:
-                    for weight_idx in range(len(child.controller.weights
-                                            [layer_idx][node_idx])):
+                    for k in range(len(child.controller.weights[i][j])):
                         random_parent = random.choice(parents)
-                        self.set_weights(random_parent, layer_idx, node_idx,
-                                         weight_idx, child)
+                        self.set_weights(random_parent, i, j, k, child)
         return child
 
     def set_bias_output(self, parents, child, i):

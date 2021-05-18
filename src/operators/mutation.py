@@ -5,51 +5,61 @@ class Mutation(object):
 
     def __init__(self, mutation_case, mutation_rate):
         self.mutation_rate = mutation_rate
-        if mutation_case == "MUTATION":
+        if mutation_case == "FIRST_IMPL":
             self.mutation = lambda x: self.mutation_first_impl(x)
+        if mutation_case == "NONUNIFORM":
+            self.mutation = lambda x: self.nonuniform_mutation(x)
+
+    def nonuniform_mutation(self, nn):
+
+        # TODO
+        mu = 0
+        sigma = .5
+
+        for i in range(len(nn.weights)):
+            for j in range(len(nn.weights[i])):
+                if i < nn.n_hidden:
+                    nn.bias[i][j] += random.gauss(mu, sigma)
+
+                nn.weights[i][j] = [weight + random.gauss(mu, sigma) for weight
+                                    in nn.weights[i][j]]
 
     def mutation_first_impl(self, nn):
+        for i in range(len(nn.weights)):
+            for j in range(len(nn.weights[i])):
+                if i < nn.n_hidden and (random.random() > self.mutation_rate):
+                    nn.bias[i][j] = self.mutate_bias(nn.bias[i][j])
 
-        for layer_idx in range(len(nn.weights)):
-            for node_idx in range(len(nn.weights[layer_idx])):
-                if layer_idx != 1 and layer_idx < (nn.n_hidden - 1) and (
-                  random.random() > self.mutation_rate):
-                    self.mutate_bias(nn, layer_idx, node_idx)
+                for k in range(len(nn.weights[i][j])):
+                    if (random.random() > self.mutation_rate):
+                        nn.weights[i][j][k] = self.mutate_weight(nn.weights
+                                                                 [i][j][k], nn)
 
-            for weight_idx in range(len(nn.weights[layer_idx][node_idx])):
-                if (random.random() > self.mutation_rate):
-                    self.mutate_weight(nn, layer_idx, node_idx, weight_idx)
+    def mutate_bias(self, bias):
+        random_number = random.randint(1, 4)
+        if random_number == 1:
+            return random.random()
+        elif random_number == 2:
+            return bias + random.random() * 2 - 1
+        elif random_number == 3:
+            return 0.0
+        elif random_number == 4:
+            return -bias
 
-    def mutate_bias(self, nn, i, j):
+    def mutate_weight(self, weight, nn):
         random_number = random.randint(1, 5)
         if random_number == 1:
-            nn.bias[i][j] = random.random()
+            return random.random()
         elif random_number == 2:
-            nn.bias[i][j] += random.random()
+            return weight + random.random() * 2 - 1
         elif random_number == 3:
-            nn.bias[i][j] -= random.random()
+            return 0.0
         elif random_number == 4:
-            nn.bias[i][j] = 0.0
+            return -weight
         elif random_number == 5:
-            nn.bias[i][j] *= (-1)
-        # random.gauss(mu, sigma)
-
-    def mutate_weight(self, nn, i, j, k):
-        random_number = random.randint(1, 6)
-        if random_number == 1:
-            nn.weights[i][j][k] = random.random()
-        elif random_number == 2:
-            nn.weights[i][j][k] += random.random()
-        elif random_number == 3:
-            nn.weights[i][j][k] -= random.random()
-        elif random_number == 4:
-            nn.weights[i][j][k] = 0.0
-        elif random_number == 5:
-            nn.weights[i][j][k] *= (-1)
-        elif random_number == 6:
             random_i = random.randint(0, len(nn.weights)-1)
             random_j = random.randint(0, len(nn.weights
                                       [random_i]) - 1)
             random_k = random.randint(0, len(nn.weights
                                       [random_i][random_j])-1)
-            nn.weights[i][j][k] = (nn.weights[random_i][random_j][random_k])
+            return (nn.weights[random_i][random_j][random_k])

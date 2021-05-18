@@ -16,7 +16,7 @@ class Population_Manager(object):
 
         # evolutionary operators
         self.selection_obj = Selection("RANK_BASED_SELECTION")
-        self.mutation_obj = Mutation("MUTATION", Const['MUTATION_RATE'])
+        self.mutation_obj = Mutation("NONUNIFORM", Const['MUTATION_RATE'])
         self.crossover_obj = Crossover("CROSSOVER", Const['PROB_NODE_COPY'])
 
     def breed_init_population(self):
@@ -34,6 +34,7 @@ class Population_Manager(object):
                        for i in range(self.Const['N_PARENTS'])]
             self.population.append(self.crossover_obj.crossover(parents))
 
-        # for individuum in self.population:
-        #     if not individuum.survived:
-        #         self.mutation_obj.mutate(individuum.controller)
+        for individuum in self.population:
+            if not individuum.survived:
+                self.mutation_obj.mutation(individuum.controller)
+                pass

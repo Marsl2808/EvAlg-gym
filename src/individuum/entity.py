@@ -1,4 +1,4 @@
-from src.neuralNet import Neural_Network
+from src.individuum.neuralNet import Neural_Network
 from src.optional.welford import Welford
 
 

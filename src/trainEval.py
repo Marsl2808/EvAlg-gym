@@ -11,6 +11,7 @@ class TrainEval(object):
         self.plot_fitness_diversity(population)
 
     def calc_diversity(self, population):
+        # TODO: FFT
         start_t = time.time()
         for entity in population:
             weights_e1 = entity.controller.weights
@@ -42,3 +43,7 @@ class TrainEval(object):
 
         plt.show()
         plt.clf()
+
+    def eval_survived_indices(self):
+        # TODO: plot histogram
+        pass

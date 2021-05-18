@@ -1,5 +1,4 @@
 from src.individuum.neuralNet import Neural_Network
-from src.optional.welford import Welford
 
 
 class Entity(object):
@@ -11,7 +10,3 @@ class Entity(object):
 
         # diversity
         self.hamming_dist = 0
-        self.action_sequ = []
-
-        self.obs_norm = [Welford() for i in range(n_layer_nodes[0])]
-        self.updated_obs_norm = [Welford() for i in range(n_layer_nodes[0])]

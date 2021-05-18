@@ -15,13 +15,6 @@ class Crossover():
         child = Entity(parents[0].controller.n_layer_nodes,
                        parents[0].controller.weight_interval)
 
-        #################################
-        # Welford
-        child.obs_norm = deepcopy(random.choice(parents)
-                                  .updated_obs_norm)
-        child.updated_obs_norm = deepcopy(child.obs_norm)
-        #################################
-
         for layer_idx in range(len(child.controller.weights)):
             if layer_idx == child.controller.n_hidden:
                 set_bias_output(parents, child, layer_idx)

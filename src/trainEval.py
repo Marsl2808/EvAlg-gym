@@ -22,19 +22,16 @@ class TrainEval(object):
                     break
                 else:
                     # loop over layers
-                    for l in range(len(weights_e1)):
+                    for i in range(len(weights_e1)):
                         # loop over nodes
-                        for n in range(len(weights_e1[l])):
-                            # TODO: inplace?
-                            sm = SequMatch(None, weights_e1[l][n].round(3),
-                                           weights_e2[l][n].round(3))
+                        for j in range(len(weights_e1[i])):
+                            sm = SequMatch(None, weights_e1[i][j].round(3),
+                                           weights_e2[i][j].round(3))
                             # (=2M/T) (T:# elems both sequences, M: # matches)
                             entity_2.hamming_dist += sm.ratio()
-
-        logging.info(f"Time for diversity calculation: {time.time() - start_t}")
+        logging.info(f"Time Diversity calc.: {time.time() - start_t}")
 
     def plot_fitness_diversity(self, population):
-
         plt.plot([x.fitness for x in population],
                  [x.hamming_dist for x in population], 'ro')
         plt.grid(which='both')
@@ -43,7 +40,3 @@ class TrainEval(object):
 
         plt.show()
         plt.clf()
-
-    def eval_survived_indices(self):
-        # TODO: plot histogram
-        pass

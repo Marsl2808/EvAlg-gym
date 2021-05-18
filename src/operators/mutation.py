@@ -14,7 +14,7 @@ class Mutation(object):
 
         # TODO
         mu = 0
-        sigma = .5
+        sigma = .3
 
         for i in range(len(nn.weights)):
             for j in range(len(nn.weights[i])):

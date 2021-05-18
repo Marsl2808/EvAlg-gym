@@ -57,8 +57,8 @@ if __name__ == '__main__':
             if not entity.survived:
                 agent_env_loop(entity, generation)
 
-        # if generation % 100 == 0:
-        #     train_evaluator.eval_training(pop_manager.population)
+        if generation % 100 == 0:
+            train_evaluator.eval_training(pop_manager.population)
 
         pop_manager.breed_new_population()
 

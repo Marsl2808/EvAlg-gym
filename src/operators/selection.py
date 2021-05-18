@@ -5,11 +5,11 @@ from copy import deepcopy
 
 class Selection(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, selection_case):
+        if selection_case == "RANK_BASED_SELECTION":
+            self.selection = lambda x: self.rank_based_selection(x)
 
-    @staticmethod
-    def rank_based_selection(population_in):
+    def rank_based_selection(self, population_in):
         # survival of the fittest
         population_in.sort(key=lambda x: x.fitness, reverse=True)
         logging.info(f"max fitness: {population_in[0].fitness}")

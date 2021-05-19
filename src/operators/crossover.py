@@ -23,8 +23,7 @@ class Crossover(object):
                 random_parent = random.choice(parents)
 
                 if i < child.controller.n_hidden:
-                    self.set_bias_hidden(child, i, j,
-                                         random_parent)
+                    self.set_bias_hidden(child, i, j, random_parent)
 
                 if random.random() > self.prob_node_copy:
                     self.copy_node(child, i, j, random_parent)
@@ -46,7 +45,7 @@ class Crossover(object):
     def copy_node(self, child, i, j, parent):
         child.controller.weights[i][j] = parent.controller.weights[i][j]
         # first layer no bias, last layer differnet size TODO
-        if i != 1 and i < child.controller.n_hidden - 1:
+        if i < child.controller.n_hidden:
             child.controller.bias[i][j] = parent.controller.bias[i][j]
 
     def set_weights(self, parent, i, j, k, child):

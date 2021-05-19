@@ -28,7 +28,7 @@ class Population_Manager(object):
     def breed_new_population(self):
         pop_size_in = len(self.population)
         self.population = self.selection_obj.selection(self.population)
-        logging.info(f"{pop_size_in - len(self.population)} survived walker")
+        logging.info(f"{len(self.population)} survived walker")
 
         while(len(self.population) < pop_size_in):
             parents = [deepcopy(random.choice(self.population))
@@ -36,6 +36,6 @@ class Population_Manager(object):
             self.population.append(self.crossover_obj.crossover(parents))
 
         for individuum in self.population:
+            # ???
             if not individuum.survived:
                 self.mutation_obj.mutation(individuum.controller)
-                pass

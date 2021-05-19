@@ -18,22 +18,21 @@ class Mutation(object):
 
         for i in range(len(nn.weights)):
             for j in range(len(nn.weights[i])):
-                if i < nn.n_hidden:
-                    nn.bias[i][j] += random.gauss(mu, sigma)
+                # if i < nn.n_hidden:
+                #     nn.bias[i][j] += random.gauss(mu, sigma)
 
                 nn.weights[i][j] = [weight + random.gauss(mu, sigma) for weight
                                     in nn.weights[i][j]]
 
     def mutation_first_impl(self, nn):
         for i in range(len(nn.weights)):
+            nn.bias[i] = [self.mutate_bias(x)
+                          if random.random() < self.mutation_rate else x
+                          for x in nn.bias[i]]
             for j in range(len(nn.weights[i])):
-                if i < nn.n_hidden and (random.random() > self.mutation_rate):
-                    nn.bias[i][j] = self.mutate_bias(nn.bias[i][j])
-
-                for k in range(len(nn.weights[i][j])):
-                    if (random.random() > self.mutation_rate):
-                        nn.weights[i][j][k] = self.mutate_weight(nn.weights
-                                                                 [i][j][k], nn)
+                nn.weights[i][j] = [self.mutate_weight(x)
+                                    if random.random() < self.mutation_rate
+                                    else x for x in nn.weights[i][j]]
 
     def mutate_bias(self, bias):
         random_number = random.randint(1, 4)
@@ -46,8 +45,8 @@ class Mutation(object):
         elif random_number == 4:
             return -bias
 
-    def mutate_weight(self, weight, nn):
-        random_number = random.randint(1, 5)
+    def mutate_weight(self, weight):
+        random_number = random.randint(1, 4)
         if random_number == 1:
             return random.random()
         elif random_number == 2:
@@ -56,10 +55,10 @@ class Mutation(object):
             return 0.0
         elif random_number == 4:
             return -weight
-        elif random_number == 5:
-            random_i = random.randint(0, len(nn.weights)-1)
-            random_j = random.randint(0, len(nn.weights
-                                      [random_i]) - 1)
-            random_k = random.randint(0, len(nn.weights
-                                      [random_i][random_j])-1)
-            return (nn.weights[random_i][random_j][random_k])
+        # elif random_number == 5:
+        #     random_i = random.randint(0, len(nn.weights)-1)
+        #     random_j = random.randint(0, len(nn.weights
+        #                               [random_i]) - 1)
+        #     random_k = random.randint(0, len(nn.weights
+        #                               [random_i][random_j])-1)
+        #     return (nn.weights[random_i][random_j][random_k])

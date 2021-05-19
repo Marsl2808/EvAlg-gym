@@ -10,7 +10,6 @@ class Selection(object):
             self.selection = lambda x: self.rank_based_selection(x)
 
     def rank_based_selection(self, population_in):
-        # survival of the fittest
         population_in.sort(key=lambda x: x.fitness, reverse=True)
         logging.info(f"max fitness: {population_in[0].fitness}")
 

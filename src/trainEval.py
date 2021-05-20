@@ -16,19 +16,16 @@ class TrainEval(object):
         for entity in population:
             weights_e1 = entity.controller.weights
             for entity_2 in population:
-                entity_2.hamming_dist = 0
+                entity.hamming_dist = 0
                 weights_e2 = entity_2.controller.weights
-                if id(entity) == id(entity_2):
-                    continue
-                else:
-                    # loop over layers
-                    for i in range(len(weights_e1)):
-                        # loop over nodes
-                        for j in range(len(weights_e1[i])):
-                            sm = SequMatch(None, weights_e1[i][j].round(3),
-                                           weights_e2[i][j].round(3))
-                            # (=2M/T) (T:# elems both sequences, M: # matches)
-                            entity_2.hamming_dist += sm.ratio()
+                # loop over layers
+                for i in range(len(weights_e1)):
+                    # loop over nodes
+                    for j in range(len(weights_e1[i])):
+                        sm = SequMatch(None, weights_e1[i][j].round(3),
+                                       weights_e2[i][j].round(3))
+                        # (=2M/T) (T:# elems both sequences, M: # matches)
+                        entity.hamming_dist += sm.ratio()
         logging.info(f"Time Diversity calc.: {time.time() - start_t}")
 
     def plot_fitness_diversity(self, population):

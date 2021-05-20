@@ -16,7 +16,7 @@ class Population_Manager(object):
 
         # TODO: outsource Params
         self.survivor_selection_operator = Survivor_Selection("NAIVE_RANK_BASED")
-        self.parent_selection_operator = Parent_Selection("LINEAR_RANKED", Const["N_PARENTS"])
+        self.parent_selection_operator = Parent_Selection("EXP_RANKED", Const["N_PARENTS"])
         self.mutation_operator = Mutation("FIRST_IMPL", Const['MUTATION_RATE'])
         self.crossover_operator = Crossover("CROSSOVER", Const['PROB_NODE_COPY'])
 

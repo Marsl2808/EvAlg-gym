@@ -14,7 +14,7 @@ print(f"Dim. observation space: {env.observation_space.shape}")
 
 # training Params
 Const = {
-    'POP_SIZE': 10,
+    'POP_SIZE': 5,
     'MUTATION_RATE': .1,
     'PROB_NODE_COPY': .1,
     'N_PARENTS': 3,
@@ -57,7 +57,7 @@ if __name__ == '__main__':
             if not entity.survived:
                 agent_env_loop(entity, generation)
 
-        if generation % 100 == 0:
+        if generation % 10 == 0:
             train_evaluator.eval_training(pop_manager.population)
 
         pop_manager.breed_new_population()

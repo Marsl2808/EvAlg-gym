@@ -1,10 +1,10 @@
-import random
 import logging
 from copy import deepcopy
 from src.individuum.entity import Entity
-from src.operators.selection import Selection
+from src.operators.survivor_selection import Survivor_Selection
 from src.operators.crossover import Crossover
 from src.operators.mutation import Mutation
+from src.operators.parent_selection import Parent_Selection
 
 
 class Population_Manager(object):
@@ -15,10 +15,10 @@ class Population_Manager(object):
         self.population = self.breed_init_population()
 
         # TODO: outsource Params
-        # evolutionary operators
-        self.selection_obj = Selection("RANK_BASED_SELECTION")
-        self.mutation_obj = Mutation("FIRST_IMPL", Const['MUTATION_RATE'])
-        self.crossover_obj = Crossover("CROSSOVER", Const['PROB_NODE_COPY'])
+        self.survivor_selection_operator = Survivor_Selection("NAIVE_RANK_BASED")
+        self.parent_selection_operator = Parent_Selection("LINEAR_RANKED", Const["N_PARENTS"])
+        self.mutation_operator = Mutation("FIRST_IMPL", Const['MUTATION_RATE'])
+        self.crossover_operator = Crossover("CROSSOVER", Const['PROB_NODE_COPY'])
 
     def breed_init_population(self):
         return [Entity(self.Const['N_LAYER_NODES'],
@@ -27,15 +27,14 @@ class Population_Manager(object):
 
     def breed_new_population(self):
         pop_size_in = len(self.population)
-        self.population = self.selection_obj.selection(self.population)
+        self.population = self.survivor_selection_operator.selection(self.population)
+        pop_tmp = deepcopy(self.population)
         logging.info(f"{len(self.population)} survived walker")
 
         while(len(self.population) < pop_size_in):
-            parents = [deepcopy(random.choice(self.population))
-                       for i in range(self.Const['N_PARENTS'])]
-            self.population.append(self.crossover_obj.crossover(parents))
+            parents = self.parent_selection_operator.selection(pop_tmp)
+            self.population.append(self.crossover_operator.crossover(parents))
 
         for individuum in self.population:
-            # ???
             if not individuum.survived:
-                self.mutation_obj.mutation(individuum.controller)
+                self.mutation_operator.mutation(individuum.controller)

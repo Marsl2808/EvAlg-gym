@@ -11,16 +11,15 @@ class Mutation(object):
             self.mutation = lambda x: self.nonuniform_mutation(x)
 
     def nonuniform_mutation(self, nn):
-
+        # mutation prob = 1
         # TODO
         mu = 0
         sigma = .3
 
         for i in range(len(nn.weights)):
+            nn.bias[i] = [x + random.gauss(mu, sigma)
+                          for x in nn.bias[i]]
             for j in range(len(nn.weights[i])):
-                # if i < nn.n_hidden:
-                #     nn.bias[i][j] += random.gauss(mu, sigma)
-
                 nn.weights[i][j] = [weight + random.gauss(mu, sigma) for weight
                                     in nn.weights[i][j]]
 

@@ -19,7 +19,7 @@ class TrainEval(object):
                 entity_2.hamming_dist = 0
                 weights_e2 = entity_2.controller.weights
                 if id(entity) == id(entity_2):
-                    break
+                    continue
                 else:
                     # loop over layers
                     for i in range(len(weights_e1)):

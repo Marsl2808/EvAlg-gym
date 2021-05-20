@@ -25,9 +25,8 @@ class Crossover(object):
                 if i < child.controller.n_hidden:
                     self.set_bias_hidden(child, i, j, random_parent)
 
-                if random.random() > self.prob_node_copy:
+                if random.random() < self.prob_node_copy:
                     self.copy_node(child, i, j, random_parent)
-
                 else:
                     for k in range(len(child.controller.weights[i][j])):
                         random_parent = random.choice(parents)
